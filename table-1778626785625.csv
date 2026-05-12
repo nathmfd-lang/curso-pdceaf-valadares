@@ -1,0 +1,10 @@
+﻿Funcionalidade,Status,Detalhes
+**8 Módulos**,✅ Completo,"Panorama, Trilha, Medicamentos, Elegibilidade, Desafio, Vídeos, Fórum, Problemas"
+**33 Questões**,✅ Ativas,"11 por módulo (Medicamentos, Critérios, Desafio) com feedback imediato"
+**Certificado**,✅ Funcional,Emissão ao atingir 60% em todos os módulos
+**Design Responsivo**,✅ Mobile/Desktop,"Menu colapsável, cards adaptáveis"
+**Paleta Institucional**,"✅ #173f47, #36585b, #78946f, #f8f3e7",Conforme especificação
+**Progresso Visual**,✅ Sidebar,Barra de progresso com % de conclusão
+**Fórum**,✅ Interface,"Criar perguntas, listar discussões"
+**Vídeos**,✅ Placeholders,5 demonstrações do SIGAF
+**Resolução de Problemas**,✅ 6 cenários,Com soluções práticas

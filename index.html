@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso PDCEAF - Da Norma à Dispensação Segura</title>
+    <style>
+        :root {
+            --primary: #173f47;
+            --secondary: #36585b;
+            --accent: #78946f;
+            --bg: #f8f3e7;
+            --text: #617578;
+            --white: #ffffff;
+            --shadow: rgba(23, 63, 71, 0.1);
+            --success: #78946f;
+            --warning: #d4a574;
+            --error: #c47575;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .app { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 280px;
+            background: var(--primary);
+            color: var(--white);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo { font-size: 18px; font-weight: bold; color: var(--white); margin-bottom: 4px; }
+        .subtitle { font-size: 11px; opacity: 0.8; line-height: 1.4; }
+
+        .nav-menu { padding: 16px 0; }
+
+        .nav-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.1); border-left-color: var(--accent); }
+        .nav-item.active { background: rgba(255,255,255,0.15); border-left-color: var(--accent); }
+
+        .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .nav-text { flex: 1; }
+        .nav-title { font-size: 13px; font-weight: 600; }
+        .nav-desc { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+
+        .quiz-badge {
+            background: var(--accent);
+            color: var(--white);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            margin: 24px;
+            padding: 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .progress-label { font-size: 11px; margin-bottom: 8px; opacity: 0.9; }
+        .progress-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s ease; }
+        .progress-value { font-size: 11px; margin-top: 6px; text-align: right; opacity: 0.8; }
+
+        .main { margin-left: 280px; flex: 1; padding: 32px; max-width: 900px; }
+
+        .header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid var(--primary); }
+        .header h1 { font-size: 28px; color: var(--primary); margin-bottom: 8px; font-weight: bold; }
+        .header p { font-size: 14px; color: var(--secondary); }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .card-title {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-content { color: var(--text); line-height: 1.8; }
+        .card-content p { margin-bottom: 12px; }
+        .card-content ul { margin-left: 20px; margin-bottom: 16px; }
+        .card-content li { margin-bottom: 8px; }
+        .card-content strong { color: var(--primary); }
+
+        .quiz-container {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .quiz-title { font-size: 20px; color: var(--primary); font-weight: bold; }
+
+        .quiz-counter {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .question { font-size: 16px; color: var(--primary); margin-bottom: 20px; font-weight: 600; line-height: 1.5; }
+
+        .options { display: flex; flex-direction: column; gap: 10px; }
+
+        .option {
+            padding: 14px 18px;
+            border: 2px solid var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option:hover { border-color: var(--secondary); background: var(--bg); }
+        .option.selected { border-color: var(--primary); background: rgba(23, 63, 71, 0.05); }
+        .option.correct { border-color: var(--success); background: rgba(120, 148, 111, 0.1); }
+        .option.wrong { border-color: var(--error); background: rgba(196, 117, 117, 0.1); }
+
+        .option-marker {
+            width: 24px; height: 24px;
+            border: 2px solid var(--text);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; flex-shrink: 0;
+        }
+
+        .option.correct .option-marker { background: var(--success); border-color: var(--success); color: white; }
+        .option.wrong .option-marker { background: var(--error); border-color: var(--error); color: white; }
+
+        .feedback {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(120, 148, 111, 0.1); border-left: 4px solid var(--success); }
+        .feedback.wrong { background: rgba(196, 117, 117, 0.1); border-left: 4px solid var(--error); }
+
+        .feedback-title { font-weight: bold; margin-bottom: 8px; }
+        .feedback.correct .feedback-title { color: var(--success); }
+        .feedback.wrong .feedback-title { color: var(--error); }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--bg);
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-primary:hover { background: var(--secondary); }
+        .btn-secondary { background: var(--bg); color: var(--text); }
+        .btn-secondary:hover { background: #e8e0d0; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .results-container { text-align: center; padding: 40px; }
+
+        .score-circle {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            border: 8px solid var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .score-value { font-size: 36px; font-weight: bold; color: var(--primary); }
+        .score-label { font-size: 12px; color: var(--text); margin-top: 4px; }
+
+        .result-message { font-size: 20px; color: var(--primary); margin-bottom: 16px; }
+        .result-detail { color: var(--text); margin-bottom: 24px; }
+
+        .certificate-preview {
+            background: linear-gradient(135deg, #f8f3e7 0%, #fff 50%, #f8f3e7 100%);
+            border: 3px solid var(--primary);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .certificate-preview::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .cert-title {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .cert-subtitle { font-size: 14px; color: var(--secondary); margin-bottom: 32px; }
+
+        .cert-name {
+            font-size: 20px;
+            color: var(--primary);
+            font-weight: bold;
+            margin: 24px 0;
+            padding: 16px;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+
+        .cert-scores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 24px auto;
+            max-width: 500px;
+        }
+
+        .cert-score-item { background: rgba(23, 63, 71, 0.05); padding: 12px; border-radius: 8px; }
+        .cert-score-label { font-size: 11px; color: var(--text); margin-bottom: 4px; }
+        .cert-score-value { font-size: 18px; font-weight: bold; color: var(--primary); }
+
+        .cert-footer { margin-top: 32px; font-size: 12px; color: var(--text); }
+        .cert-responsible { font-weight: bold; color: var(--primary); }
+
+        .forum-list { display: flex; flex-direction: column; gap: 16px; }
+
+        .forum-item {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 4px var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .forum-item:hover { box-shadow: 0 2px 8px var(--shadow); transform: translateY(-1px); }
+
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .forum-title { font-size: 15px; font-weight: 600; color: var(--primary); flex: 1; }
+
+        .forum-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .forum-status.resolved { background: rgba(120, 148, 111, 0.15); color: var(--success); }
+        .forum-status.open { background: rgba(212, 165, 116, 0.15); color: var(--warning); }
+
+        .forum-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        .forum-meta span { display: flex; align-items: center; gap: 4px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 6px; }
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--bg);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { outline: none; border-color: var(--secondary); }
+        textarea.form-input { min-height: 120px; resize: vertical; }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 48px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .hero h2 { font-size: 32px; margin-bottom: 16px; }
+        .hero p { font-size: 16px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stat { background: rgba(255,255,255,0.1); padding: 16px; border-radius: 8px; }
+        .hero-stat-value { font-size: 24px; font-weight: bold; }
+        .hero-stat-label { font-size: 11px; opacity: 0.8; margin-top: 4px; }
+
+        .timeline { position: relative; padding-left: 32px; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px; top: 0; bottom: 0;
+            width: 2px;
+            background: var(--accent);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 1px 4px var(--shadow);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -28px; top: 20px;
+            width: 12px; height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+
+        .timeline-title { font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+        .timeline-desc { font-size: 13px; color: var(--text); }
+
+        .checklist { list-style: none; }
+        .checklist li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--bg);
+        }
+        .checklist li:last-child { border-bottom: none; }
+
+        .check-icon {
+            width: 20px; height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .check-icon.checked { background: var(--accent); color: white; }
+
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+
+        .video-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px var(--shadow);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .video-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(--shadow); }
+
+        .video-thumb {
+            height: 140px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 40px;
+        }
+
+        .video-info { padding: 16px; }
+        .video-title { font-weight: 600; color: var(--primary); margin-bottom: 4px; font-size: 14px; }
+        .video-desc { font-size: 12px; color: var(--text); opacity: 0.8; }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 16px; left: 16px;
+            z-index: 200;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 16px; padding-top: 60px; }
+            .mobile-toggle { display: block; }
+            .hero-stats { grid-template-columns: 1fr; }
+            .cert-scores { grid-template-columns: 1fr; }
+        }
+
+        .hidden { display: none !important; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-success { background: rgba(120, 148, 111, 0.15); color: var(--success); }
+        .badge-warning { background: rgba(212, 165, 116, 0.15); color: var(--warning); }
+
+        .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.4s ease; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--primary); }
+        ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <button class="mobile-toggle" onclick="toggleSidebar()">☰ Menu</button>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">PDCEAF</div>
+                <div class="subtitle">Da Norma à Dispensação Segura</div>
+            </div>
+
+            <nav class="nav-menu" id="navMenu"></nav>
+
+            <div class="progress-bar">
+                <div class="progress-label">Seu Progresso</div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-value" id="progressValue">0% completo</div>
+            </div>
+        </aside>
+
+        <main class="main" id="mainContent"></main>
+    </div>
+
+<script>
+// Course Data
+const courseData = {
+    modules: [
+        {
+            id: 1,
+            title: "Panorama",
+            desc: "Contextualização da PDCEAF",
+            icon: "🌐",
+            hasQuiz: false,
+            content: `
+                <div class="hero">
+                    <h2>Bem-vindo ao Curso PDCEAF</h2>
+                    <p>Política de Descentralização do Componente Especializado da Assistência Farmacêutica</p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">8</div>
+                            <div class="hero-stat-label">Módulos</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">33</div>
+                            <div class="hero-stat-label">Questões</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">60%</div>
+                            <div class="hero-stat-label">Mínimo Aprovação</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📋 O que é PDCEAF?</div>
+                    <div class="card-content">
+                        <p>A <strong>Política de Descentralização do Componente Especializado da Assistência Farmacêutica (PDCEAF)</strong> foi implementada em Minas Gerais em 2021 e revolucionou o acesso aos medicamentos do CEAF.</p>
+                        <p>Até novembro de 2023, <strong>72% dos municípios mineiros</strong> aderiram à política, resultando em:</p>
+                        <ul>
+                            <li>R$ 45,9 milhões investidos em adequação de infraestrutura</li>
+                            <li>R$ 15,3 milhões em custeio dos serviços</li>
+                            <li>Cerca de 9 mil novos usuários atendidos (aumento de 14%)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🎯 Objetivos da Política</div>
+                    <div class="card-content">
+                        <ul>
+                            <li><strong>Ampliar o acesso</strong> aos medicamentos especializados</li>
+                            <li><strong>Qualificar</strong> a assistência farmacêutica</li>
+                            <li><strong>Promover o uso racional</strong> de medicamentos</li>
+                            <li><strong>Garantir a segurança</strong> na dispensação</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🏛️ Responsabilidades</div>
+                    <div class="card-content">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-title">União</div>
+                                <div class="timeline-desc">Financiamento, normatização e definição dos PCDT (Protocolos Clínicos e Diretrizes Terapêuticas)</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Estado</div>
+                                <div class="timeline-desc">Coordenação, suporte técnico, distribuição e capacitação dos municípios</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Município</div>
+                                <div class="timeline-desc">Execução da dispensação, gestão local e atendimento direto ao cidadão</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">✅ Checklist de Execução</div>
+                    <div class="card-content">
+                        <ul class="checklist" id="checklist1">
+                            <li><span class="check-icon" onclick="toggleCheck(this)">✓</span> Estrutura física adequada</li>
+                            <li><span class="check-icon" onclick="toggleCheck(this)">✓</span> Farmacêutico responsável habilitado</li>
+                            <li><span class="check-icon" onclick="toggleCheck(this)">✓</span> Acesso ao SIGAF</li>
+                            <li><span class="check-icon" onclick="toggleCheck(this)">✓</span> Protocolos atualizados</li>
+                            <li><span class="check-icon" onclick="toggleCheck(this)">✓</span> Estoque organizado</li>
+                            <li><span class="check-icon" onclick="toggleCheck(this)">✓</span> Documentação padronizada</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📜 Legislação Relevante</div>
+                    <div class="card-content">
+                        <ul>
+                            <li>Resolução SES/MG nº 9.063/2021 - Institui a PDCEAF</li>
+                            <li>Resolução SES/MG nº 10.128/2025 - Atualiza normativas</li>
+                            <li>Portaria GM/MS nº 2.981/2009 - Cria o CEAF</li>
+                            <li>Portaria GM/MS nº 1554/2013 - Regulamenta a Assistência Farmacêutica</li>
+                        </ul>
+                    </div>
+                </div>
+            `
+        },
+        {
+            id: 2,
+            title: "Trilha",
+            desc: "Guia de aprendizado",
+            icon: "🗺️",
+            hasQuiz: false,
+            content: `
+                <div class="header">
+                    <h1>Trilha de Aprendizado</h1>
+                    <p>Siga o caminho recomendado para aproveitar ao máximo o curso</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🎯 Mapa de Aprendizagem</div>
+                    <div class="card-content">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-title">Módulo 1: Panorama</div>
+                                <div class="timeline-desc">Entenda o contexto, histórico e objetivos da PDCEAF (30 min)</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Módulo 3: Medicamentos</div>
+                                <div class="timeline-desc">Conheça as categorias e critérios (45 min + Quiz)</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Módulo 4: Elegibilidade</div>
+                                <div class="timeline-desc">Documentação e fluxos de validação (45 min + Quiz)</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Módulo 5: Desafio Prático</div>
+                                <div class="timeline-desc">Aplique conhecimento em cenários reais (Quiz)</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Módulo 6: Vídeos</div>
+                                <div class="timeline-desc">Demonstrações práticas do SIGAF (60 min)</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Certificado</div>
+                                <div class="timeline-desc">Emita seu certificado ao atingir 60% de aproveitamento</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📋 Pré-requisitos</div>
+                    <div class="card-content">
+                        <ul>
+                            <li>Conhecimento básico em assistência farmacêutica</li>
+                            <li>Familiaridade com o SUS e níveis de atenção</li>
+                            <li>Acesso ao SIGAF (para prática)</li>
+                            <li>Tempo estimado total: <strong>8 horas</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            `
+        },
+        {
+            id: 3,
+            title: "Medicamentos",
+            desc: "Medicamentos do CEAF",
+            icon: "💊",
+            hasQuiz: true,
+            quizId: "medicamentos"
+        },
+        {
+            id: 4,
+            title: "Elegibilidade",
+            desc: "Critérios de acesso",
+            icon: "📋",
+            hasQuiz: true,
+            quizId: "criterios"
+        },
+        {
+            id: 5,
+            title: "Desafio",
+            desc: "Cenários práticos",
+            icon: "🏆",
+            hasQuiz: true,
+            quizId: "desafio"
+        },
+        {
+            id: 6,
+            title: "Vídeos",
+            desc: "Demonstrações visuais",
+            icon: "🎥",
+            hasQuiz: false,
+            content: `
+                <div class="header">
+                    <h1>Vídeos de Demonstração</h1>
+                    <p>Aprenda visualmente com tutoriais práticos</p>
+                </div>
+
+                <div class="video-grid">
+                    <div class="video-card" onclick="alert('Vídeo: Introdução ao SIGAF')">
+                        <div class="video-thumb">▶️</div>
+                        <div class="video-info">
+                            <div class="video-title">Introdução ao SIGAF</div>
+                            <div class="video-desc">Navegação básica e funcionalidades do sistema</div>
+                        </div>
+                    </div>
+                    <div class="video-card" onclick="alert('Vídeo: Fluxo de Solicitação')">
+                        <div class="video-thumb">📋</div>
+                        <div class="video-info">
+                            <div class="video-title">Fluxo de Solicitação</div>
+                            <div class="video-desc">Passo a passo completo de pedidos</div>
+                        </div>
+                    </div>
+                    <div class="video-card" onclick="alert('Vídeo: Documentação')">
+                        <div class="video-thumb">📁</div>
+                        <div class="video-info">
+                            <div class="video-title">Documentação e Arquivo</div>
+                            <div class="video-desc">Organização e manutenção de registros</div>
+                        </div>
+                    </div>
+                    <div class="video-card" onclick="alert('Vídeo: Boas Práticas')">
+                        <div class="video-thumb">✅</div>
+                        <div class="video-info">
+                            <div class="video-title">Boas Práticas na Dispensação</div>
+                            <div class="video-desc">Checklist de segurança e qualidade</div>
+                        </div>
+                    </div>
+                    <div class="video-card" onclick="alert('Vídeo: Problemas Comuns')">
+                        <div class="video-thumb">🔧</div>
+                        <div class="video-info">
+                            <div class="video-title">Resolução de Problemas</div>
+                            <div class="video-desc">Erros frequentes e soluções práticas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-title">🔗 Links Úteis</div>
+                    <div class="card-content">
+                        <ul>
+                            <li><a href="https://sigaf.saude.mg.gov.br" target="_blank">SIGAF - Minas Gerais</a></li>
+                            <li><a href="https://www.gov.br/saude/pt-br/composicao/sectics/daf/ceaf" target="_blank">Portal CEAF - Ministério da Saúde</a></li>
+                            <li><a href="https://ajudasaf.saude.mg.gov.br" target="_blank">Ajuda SAF - Minas Gerais</a></li>
+                        </ul>
+                    </div>
+                </div>
+            `
+        },
+        {
+            id: 7,
+            title: "Fórum",
+            desc: "Dúvidas e discussões",
+            icon: "💬",
+            hasQuiz: false,
+            content: `
+                <div class="header">
+                    <h1>Fórum de Dúvidas</h1>
+                    <p>Troque experiências com outros profissionais</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📝 Nova Pergunta</div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label">Título</label>
+                            <input type="text" class="form-input" placeholder="Resuma sua dúvida">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Descrição detalhada</label>
+                            <textarea class="form-input" placeholder="Explique sua situação..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="alert('Pergunta enviada!')">Publicar Pergunta</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📊 Discussões Recentes</div>
+                    <div class="forum-list">
+                        <div class="forum-item" onclick="alert('Abrindo discussão...')">
+                            <div class="forum-header">
+                                <div class="forum-title">Medicamento não aparece no SIGAF - O que fazer?</div>
+                                <span class="forum-status resolved">Resolvido</span>
+                            </div>
+                            <div class="forum-meta">
+                                <span>👤 Farmacêutico BH</span>
+                                <span>💬 5 respostas</span>
+                                <span>👍 12 votos</span>
+                                <span>📅 2 dias atrás</span>
+                            </div>
+                        </div>
+                        <div class="forum-item" onclick="alert('Abrindo discussão...')">
+                            <div class="forum-header">
+                                <div class="forum-title">Dúvida sobre prazo de validade do laudo</div>
+                                <span class="forum-status open">Aberto</span>
+                            </div>
+                            <div class="forum-meta">
+                                <span>👤 Tec. Saúde</span>
+                                <span>💬 2 respostas</span>
+                                <span>👍 4 votos</span>
+                                <span>📅 5 horas atrás</span>
+                            </div>
+                        </div>
+                        <div class="forum-item" onclick="alert('Abrindo discussão...')">
+                            <div class="forum-header">
+                                <div class="forum-title">Termo de Conhecimento de Risco - Quando exigir?</div>
+                                <span class="forum-status resolved">Resolvido</span>
+                            </div>
+                            <div class="forum-meta">
+                                <span>👤 Prof. Maria</span>
+                                <span>💬 8 respostas</span>
+                                <span>👍 15 votos</span>
+                                <span>📅 1 semana atrás</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+        },
+        {
+            id: 8,
+            title: "Problemas",
+            desc: "Resolução de problemas",
+            icon: "🔧",
+            hasQuiz: false,
+            content: `
+                <div class="header">
+                    <h1>Resolução de Problemas</h1>
+                    <p>Orientação prática para situações comuns</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🔍 Problemas e Soluções</div>
+                    <div class="card-content">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-title">Medicamento não encontrado no SIGAF</div>
+                                <div class="timeline-desc">
+                                    <strong>Solução:</strong> Verificar código correto, consultar lista atualizada no portal do MS, verificar alteração de nomenclatura. Se persistir, acionar suporte.
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Documentação incompleta</div>
+                                <div class="timeline-desc">
+                                    <strong>Solução:</strong> Utilizar checklist do PCDT, orientar paciente sobre documentos faltantes, agendar retorno. Nunca dispensar sem documentação completa.
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Critério de elegibilidade não atendido</div>
+                                <div class="timeline-desc">
+                                    <strong>Solução:</strong> Revisar PCDT atualizado, consultar equipe técnica, orientar paciente sobre recursos. Registrar indeferimento formalmente.
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Erro ao registrar solicitação</div>
+                                <div class="timeline-desc">
+                                    <strong>Solução:</strong> Verificar conexão, limpar cache do navegador, tentar outro navegador. Se persistir, acionar suporte técnico com print do erro.
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Dúvidas sobre prazos</div>
+                                <div class="timeline-desc">
+                                    <strong>Solução:</strong> Consultar cronograma COAFE, verificar data de validade da documentação, confirmar prazo de análise no PCDT.
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-title">Contato com suporte</div>
+                                <div class="timeline-desc">
+                                    <strong>Email:</strong> suporte.sigaf@saude.mg.gov.br<br>
+                                    <strong>Telefone:</strong> (31) 3333-3333<br>
+                                    <strong>Horário:</strong> Seg-Sex, 8h às 18h
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📞 Canais de Atendimento</div>
+                    <div class="card-content">
+                        <p><strong>Secretaria de Saúde de MG:</strong> (31) 3333-3333</p>
+                        <p><strong>Ministério da Saúde:</strong> 136 (SUS)</p>
+                        <p><strong>Ouvidoria SUS:</strong> 136 opção 5</p>
+                        <p><strong>Email CEAF:</strong> ceaf@saude.gov.br</p>
+                    </div>
+                </div>
+            `
+        }
+    ]
+};
+
+// Quiz Data
+const quizData = {
+    medicamentos: [
+        {q: "Qual é a função principal do CEAF?", options: ["Venda de medicamentos de alto custo", "Garantir acesso a medicamentos especializados no SUS", "Importação de medicamentos", "Pesquisa farmacêutica"], correct: 1, explanation: "O CEAF é uma estratégia do SUS para garantir acesso a medicamentos especializados, baseada na complexidade da doença e necessidade de acompanhamento."},
+        {q: "Quais medicamentos são considerados especializados?", options: ["Todos os medicamentos de alto custo", "Medicamentos que exigem acompanhamento especializado e possuem PCDT", "Apenas medicamentos oncológicos", "Medicamentos sem prescrição"], correct: 1, explanation: "São medicamentos que exigem acompanhamento especializado e possuem Protocolos Clínicos e Diretrizes Terapêuticas (PCDT)."},
+        {q: "Como é feita a classificação dos medicamentos no CEAF?", options: ["Por ordem alfabética apenas", "Por grupos terapêuticos e CID-10", "Por preço de aquisição", "Por ordem de chegada"], correct: 1, explanation: "Classificação por grupos terapêuticos e código CID-10 da condição clínica."},
+        {q: "Qual é o critério de elegibilidade básico?", options: ["Ter renda inferior a 2 salários mínimos", "Ter diagnóstico de doença incluída nos PCDT e prescrição médica", "Ser maior de 60 anos", "Ter plano de saúde"], correct: 1, explanation: "Critério básico: diagnóstico de doença contemplada nos PCDT com prescrição médica válida."},
+        {q: "Como acessar a lista atualizada de medicamentos?", options: ["Apenas em farmácias físicas", "Portal do Ministério da Saúde e sites das SES", "Somente por telefone", "Redes sociais"], correct: 1, explanation: "Lista disponível no portal do MS e sites das Secretarias Estaduais de Saúde."},
+        {q: "Qual é o papel do farmacêutico na dispensação?", options: ["Apenas entregar o medicamento", "Verificar documentação, orientar uso e garantir segurança", "Prescrever medicamentos", "Realizar cirurgias"], correct: 1, explanation: "O farmacêutico verifica documentação, orienta sobre uso, identifica interações e garante segurança."},
+        {q: "Como documentar a dispensação no CEAF?", options: ["Não é necessário documentar", "Registrar no SIGAF e manter cópia dos documentos", "Apenas anotar em caderno", "Fotografar o paciente"], correct: 1, explanation: "Registro obrigatório no SIGAF e arquivamento dos documentos."},
+        {q: "Quais são os prazos de validade da documentação?", options: ["Documentos não expiram", "Variam conforme PCDT, geralmente 6-12 meses", "1 mês para todos", "5 anos"], correct: 1, explanation: "Prazos variam conforme o PCDT de cada medicamento, geralmente 6-12 meses."},
+        {q: "Como lidar com medicamentos vencidos?", options: ["Dispensar mesmo assim", "Seguir protocolo de descarte e notificar", "Devolver ao paciente", "Vender em outro local"], correct: 1, explanation: "Segregar e descartar conforme protocolos de resíduos de serviços de saúde."},
+        {q: "Qual é o procedimento de devolução?", options: ["Não aceitar devoluções", "Verificar integridade, registrar motivo e reintegrar se adequado", "Descartar imediatamente", "Devolver ao fabricante"], correct: 1, explanation: "Verificar integridade, registrar motivo e reintegrar ao estoque se em perfeitas condições."},
+        {q: "Como registrar a dispensação no SIGAF?", options: ["Não é obrigatório", "Acessar sistema, localizar paciente e registrar saída", "Enviar email", "Ligar para o estado"], correct: 1, explanation: "Acessar SIGAF, localizar paciente pelo CPF e registrar a saída do medicamento."}
+    ],
+    criterios: [
+        {q: "Quem pode acessar medicamentos do CEAF?", options: ["Qualquer pessoa com receita", "Pacientes com diagnóstico de doenças nos PCDT", "Apenas funcionários públicos", "Somente idosos"], correct: 1, explanation: "Acesso destinado a pacientes com diagnóstico confirmado de doenças nos PCDT."},
+        {q: "Qual documentação é necessária para primeira solicitação?", options: ["Apenas RG", "Receituário, laudos, exames e documento de identificação", "Comprovante de renda", "Carteira de trabalho"], correct: 1, explanation: "Documentação completa: receituário, laudos comprobatórios, exames atualizados e documento com foto."},
+        {q: "Como validar a elegibilidade?", options: ["Apenas visualizar receita", "Confrontar documentação com PCDT e registrar no SIGAF", "Perguntar ao paciente", "Consultar rede social"], correct: 1, explanation: "Confrontar documentação com PCDT e registrar análise no SIGAF."},
+        {q: "Quais são os critérios clínicos de elegibilidade?", options: ["Aparência do paciente", "Diagnóstico CID-10 e estágio da doença no PCDT", "Idade do paciente", "Cor da pele"], correct: 1, explanation: "Diagnóstico CID-10 e estágio/severidade conforme PCDT específico."},
+        {q: "Como comprovar o diagnóstico?", options: ["Declaração do paciente", "Laudos médicos e exames específicos do PCDT", "Atestado de óbito", "Certidão de nascimento"], correct: 1, explanation: "Laudos médicos e exames específicos exigidos pelo PCDT."},
+        {q: "Qual é o papel do prescritor?", options: ["Apenas escrever remédio", "Prescrever conforme PCDT, fornecer laudos e orientar", "Vender medicamentos", "Entregar medicamentos"], correct: 1, explanation: "Prescrever conforme PCDT, fornecer laudos e orientar o paciente."},
+        {q: "Como atualizar dados do paciente?", options: ["Não é possível", "Acessar SIGAF, localizar cadastro e editar", "Criar novo cadastro", "Enviar carta"], correct: 1, explanation: "Acessar SIGAF, localizar cadastro e editar informações."},
+        {q: "Quais são critérios de exclusão?", options: ["Cor do cabelo", "Diagnóstico fora do PCDT, prescrição inadequada ou documentação incompleta", "Altura", "Profissão"], correct: 1, explanation: "Exclusão: diagnóstico fora do PCDT, prescrição fora das diretrizes ou documentação incompleta."},
+        {q: "Como lidar com casos especiais (urgências)?", options: ["Negar atendimento", "Avaliar documentação, consultar PCDT e acionar fluxo de urgência", "Mandar para outro estado", "Ignorar"], correct: 1, explanation: "Avaliar documentação disponível, consultar PCDT e acionar fluxo de urgência se previsto."},
+        {q: "Qual é o procedimento de recurso?", options: ["Não há recurso", "Apresentar nova documentação ou solicitar revisão técnica", "Processar judicialmente", "Desistir"], correct: 1, explanation: "Apresentar nova documentação complementar ou solicitar revisão técnica."},
+        {q: "Como documentar a elegibilidade?", options: ["Não documentar", "Registrar análise, decisão e motivos no SIGAF e prontuário", "Anotar em post-it", "Falar com colega"], correct: 1, explanation: "Registrar análise, decisão e motivos no SIGAF e prontuário físico."}
+    ],
+    desafio: [
+        {q: "Cenário: Prescrição incompleta (sem dosagem). O que fazer?", options: ["Dispensar mesmo assim", "Orientar paciente a retornar ao médico", "Chutar dosagem", "Recusar permanentemente"], correct: 1, explanation: "Prescrições incompletas não podem ser dispensadas. Orientar retorno ao prescritor."},
+        {q: "Cenário: Medicamento fora de estoque. Solução?", options: ["Mandar paciente embora", "Verificar cronograma, acionar reserva ou solicitar transferência", "Dar outro similar", "Comprar na particular"], correct: 1, explanation: "Verificar cronograma COAFE, acionar estoque reserva ou solicitar transferência."},
+        {q: "Cenário: Documentação vencida (laudo de 2 anos). Procedimento?", options: ["Aceitar mesmo assim", "Solicitar laudo atualizado conforme PCDT", "Ignorar data", "Copiar data nova"], correct: 1, explanation: "Solicitar laudo atualizado conforme periodicidade do PCDT."},
+        {q: "Cenário: Critério não atendido (doença fora do PCDT). Próximos passos?", options: ["Dispensar por pena", "Explicar, orientar canais adequados e registrar", "Mentir no sistema", "Pedir propina"], correct: 1, explanation: "Explicar educadamente, orientar sobre canais adequados e registrar indeferimento."},
+        {q: "Cenário: Erro ao registrar no SIGAF. Como corrigir?", options: ["Deletar tudo", "Identificar erro, usar correção ou acionar suporte", "Ignorar", "Desligar computador"], correct: 1, explanation: "Identificar tipo de erro, usar função de correção ou acionar suporte técnico."},
+        {q: "Análise: Paciente com múltiplos medicamentos. Qual fluxo?", options: ["Dispensar tudo sem análise", "Verificar interações, validar cada PCDT e dispensar separadamente", "Escolher apenas um", "Dobrar dose"], correct: 1, explanation: "Verificar interações, validar cada PCDT e dispensar conforme protocolos."},
+        {q: "Análise: Fluxo correto para medicamento controlado", options: ["Entregar sem receita", "Conferir Notificação Receita Especial e registrar no SIGAF", "Dar metade", "Vender para outro"], correct: 1, explanation: "Conferir Notificação de Receita Especial, validar prescrição e registrar no SIGAF."},
+        {q: "Análise: Documentação para renovação de tratamento", options: ["Apenas identidade", "Receituário atualizado, avaliação médica recente e registro de evolução", "Foto do paciente", "Cartão de crédito"], correct: 1, explanation: "Receituário atualizado, avaliação médica recente e registro de evolução no SIGAF."},
+        {q: "Análise: Como comunicar indeferimento?", options: ["Gritar e expulsar", "Explicar com empatia, informar motivos e orientar", "Mentir que acabou", "Ignorar"], correct: 1, explanation: "Comunicação empática, clara quanto aos motivos e orientar sobre recursos."},
+        {q: "Análise: Resolução de conflito (paciente insatisfeito)", options: ["Chamar segurança", "Escutar, explicar processo, oferecer solução e registrar", "Brigar", "Fechar farmácia"], correct: 1, explanation: "Escutar, explicar processo de dispensação, oferecer soluções e registrar ocorrência."},
+        {q: "Síntese: Qual é a prioridade máxima na PDCEAF?", options: ["Velocidade", "Segurança do paciente e qualidade na dispensação", "Economia de papel", "Número de atendimentos"], correct: 1, explanation: "Prioridade máxima é a segurança do paciente e qualidade na dispensação."}
+    ]
+};
+
+// State
+let currentModule = 1;
+let quizState = {
+    medicamentos: { current: 0, answers: [], score: 0 },
+    criterios: { current: 0, answers: [], score: 0 },
+    desafio: { current: 0, answers: [], score: 0 }
+};
+let moduleProgress = {};
+let selectedOption = null;
+
+// Initialize
+function init() {
+    renderNav();
+    loadModule(1);
+    updateProgress();
+}
+
+// Render Navigation
+function renderNav() {
+    const nav = document.getElementById('navMenu');
+    nav.innerHTML = courseData.modules.map(m => `
+        <div class="nav-item ${m.id === currentModule ? 'active' : ''}" onclick="loadModule(${m.id})">
+            <div class="nav-icon">${m.icon}</div>
+            <div class="nav-text">
+                <div class="nav-title">${m.title}</div>
+                <div class="nav-desc">${m.desc}</div>
+            </div>
+            ${m.hasQuiz ? '<span class="quiz-badge">Quiz</span>' : ''}
+        </div>
+    `).join('');
+}
+
+// Load Module
+function loadModule(id) {
+    currentModule = id;
+    const module = courseData.modules.find(m => m.id === id);
+    const main = document.getElementById('mainContent');
+
+    if (module.content) {
+        main.innerHTML = `<div class="fade-in">${module.content}</div>`;
+    } else if (module.hasQuiz) {
+        renderQuiz(module.quizId);
+    }
+
+    renderNav();
+    window.scrollTo(0, 0);
+
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+    }
+}
+
+// Render Quiz
+function renderQuiz(quizId) {
+    const quiz = quizData[quizId];
+    const state = quizState[quizId];
+    const main = document.getElementById('mainContent');
+
+    if (state.current >= quiz.length) {
+        renderResults(quizId);
+        return;
+    }
+
+    const question = quiz[state.current];
+
+    main.innerHTML = `
+        <div class="quiz-container fade-in">
+            <div class="quiz-header">
+                <div class="quiz-title">📝 Quiz: ${courseData.modules.find(m => m.quizId === quizId).title}</div>
+                <div class="quiz-counter">${state.current + 1} / ${quiz.length}</div>
+            </div>
+
+            <div class="question">${question.q}</div>
+
+            <div class="options" id="options">
+                ${question.options.map((opt, i) => `
+                    <div class="option" onclick="selectOption(${i})" data-index="${i}">
+                        <div class="option-marker">${String.fromCharCode(65 + i)}</div>
+                        <div>${opt}</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="feedback" id="feedback">
+                <div class="feedback-title"></div>
+                <div class="feedback-text"></div>
+            </div>
+
+            <div class="quiz-nav">
+                <button class="btn btn-secondary" onclick="prevQuestion('${quizId}')" ${state.current === 0 ? 'disabled' : ''}>← Anterior</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion('${quizId}')" disabled>Confirmar →</button>
+            </div>
+        </div>
+    `;
+}
+
+// Select Option
+function selectOption(index) {
+    selectedOption = index;
+    document.querySelectorAll('.option').forEach((el, i) => {
+        el.classList.toggle('selected', i === index);
+    });
+    document.getElementById('nextBtn').disabled = false;
+    document.getElementById('nextBtn').textContent = 'Confirmar →';
+}
+
+// Next Question
+function nextQuestion(quizId) {
+    if (selectedOption === null) return;
+
+    const quiz = quizData[quizId];
+    const state = quizState[quizId];
+    const question = quiz[state.current];
+    const isCorrect = selectedOption === question.correct;
+
+    const feedback = document.getElementById('feedback');
+    feedback.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+    feedback.querySelector('.feedback-title').textContent = isCorrect ? '✓ Resposta Correta!' : '✗ Resposta Incorreta';
+    feedback.querySelector('.feedback-text').textContent = question.explanation;
+
+    document.querySelectorAll('.option').forEach((el, i) => {
+        el.classList.remove('selected');
+        if (i === question.correct) el.classList.add('correct');
+        else if (i === selectedOption && !isCorrect) el.classList.add('wrong');
+        el.onclick = null;
+    });
+
+    state.answers.push({ question: state.current, selected: selectedOption, correct: isCorrect });
+    if (isCorrect) state.score++;
+
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = state.current < quiz.length - 1 ? 'Próxima →' : 'Ver Resultados →';
+    nextBtn.onclick = () => {
+        state.current++;
+        selectedOption = null;
+        renderQuiz(quizId);
+    };
+    nextBtn.disabled = false;
+
+    moduleProgress[quizId] = { score: state.score, total: quiz.length };
+    updateProgress();
+}
+
+// Previous Question
+function prevQuestion(quizId) {
+    const state = quizState[quizId];
+    if (state.current > 0) {
+        state.current--;
+        state.answers.pop();
+        selectedOption = null;
+        renderQuiz(quizId);
+    }
+}
+
+// Render Results
+function renderResults(quizId) {
+    const quiz = quizData[quizId];
+    const state = quizState[quizId];
+    const percentage = Math.round((state.score / quiz.length) * 100);
+    const passed = percentage >= 60;
+
+    const main = document.getElementById('mainContent');
+    main.innerHTML = `
+        <div class="results-container fade-in">
+            <div class="score-circle">
+                <div>
+                    <div class="score-value">${percentage}%</div>
+                    <div class="score-label">${state.score}/${quiz.length}</div>
+                </div>
+            </div>
+
+            <div class="result-message">${passed ? '🎉 Parabéns! Você foi aprovado!' : '⚠️ Estude mais e tente novamente'}</div>
+            <div class="result-detail">
+                Você acertou ${state.score} de ${quiz.length} questões.
+                ${passed ? 'Módulo concluído com sucesso!' : 'É necessário atingir 60% de aproveitamento.'}
+            </div>
+
+            <button class="btn btn-primary" onclick="loadModule(1)">Voltar ao Início</button>
+            ${passed ? '<button class="btn btn-primary" style="margin-left: 10px;" onclick="checkCertificate()">Verificar Certificado</button>' : ''}
+        </div>
+    `;
+
+    if (passed) {
+        moduleProgress[quizId + '_completed'] = true;
+    }
+    updateProgress();
+}
+
+// Check Certificate
+function checkCertificate() {
+    const med = quizState.medicamentos.score;
+    const crit = quizState.criterios.score;
+    const des = quizState.desafio.score;
+    const total = Math.round(((med + crit + des) / 33) * 100);
+
+    if (med >= 7 && crit >= 7 && des >= 7 && total >= 60) {
+        renderCertificate(total, med, crit, des);
+    } else {
+        alert(`Você precisa completar todos os 3 quizzes com mínimo 60% cada.
+
+Progresso atual:
+- Medicamentos: ${Math.round((med/11)*100)}%
+- Critérios: ${Math.round((crit/11)*100)}%
+- Desafio: ${Math.round((des/11)*100)}%`);
+    }
+}
+
+// Render Certificate
+function renderCertificate(total, med, crit, des) {
+    const main = document.getElementById('mainContent');
+    const date = new Date().toLocaleDateString('pt-BR');
+    const name = prompt("Digite seu nome completo para o certificado:") || "Participante";
+
+    main.innerHTML = `
+        <div class="fade-in">
+            <div class="header">
+                <h1>🎓 Certificado de Conclusão</h1>
+                <p>Parabéns! Você completou o Curso PDCEAF</p>
+            </div>
+
+            <div class="certificate-preview">
+                <div class="cert-title">Certificado de Conclusão</div>
+                <div class="cert-subtitle">Curso PDCEAF: da norma à dispensação segura</div>
+
+                <div style="font-size: 14px; color: var(--text); margin: 16px 0;">Certificamos que</div>
+
+                <div class="cert-name">${name}</div>
+
+                <div style="font-size: 13px; color: var(--text); max-width: 500px; margin: 0 auto; line-height: 1.6;">
+                    completou com sucesso o curso de Política de Descentralização do Componente Especializado 
+                    da Assistência Farmacêutica, demonstrando competência nos critérios de elegibilidade, 
+                    dispensação segura e resolução de problemas.
+                </div>
+
+                <div class="cert-scores">
+                    <div class="cert-score-item">
+                        <div class="cert-score-label">Medicamentos</div>
+                        <div class="cert-score-value">${med}/11</div>
+                    </div>
+                    <div class="cert-score-item">
+                        <div class="cert-score-label">Critérios</div>
+                        <div class="cert-score-value">${crit}/11</div>
+                    </div>
+                    <div class="cert-score-item">
+                        <div class="cert-score-label">Desafio</div>
+                        <div class="cert-score-value">${des}/11</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 18px; font-weight: bold; color: var(--primary); margin: 16px 0;">
+                    Aproveitamento Total: ${total}%
+                </div>
+
+                <div class="cert-footer">
+                    <div>Emitido em ${date}</div>
+                    <div class="cert-responsible">Responsável: Nathália Mesquita de Figueiredo Duarte</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 24px;">
+                <button class="btn btn-primary" onclick="alert('Certificado salvo! Em produção, seria gerado PDF.')">📥 Download Certificado</button>
+                <button class="btn btn-secondary" style="margin-left: 10px;" onclick="loadModule(1)">Voltar ao Curso</button>
+            </div>
+        </div>
+    `;
+}
+
+// Update Progress
+function updateProgress() {
+    const modules = ['medicamentos', 'criterios', 'desafio'];
+    let completed = 0;
+
+    modules.forEach(m => {
+        if (moduleProgress[m + '_completed']) completed++;
+    });
+
+    const progress = Math.round((completed / 3) * 100);
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('progressValue').textContent = progress + '% completo';
+}
+
+// Toggle Check
+function toggleCheck(el) {
+    el.classList.toggle('checked');
+}
+
+// Toggle Sidebar
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+}
+
+// Initialize app
+init();
+</script>
+</body></html>
